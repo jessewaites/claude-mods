@@ -390,7 +390,9 @@ export const register: Register = (on, options) => {
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
     const els = $.ui.resolve(e)
     const { Box, Text, Button, Code } = els
-    const Client = 'Client' in els ? els.Client : undefined
+    // The directory's scan reads `Client` only as a JSX tag with a literal
+    // `module`, so the element is written as `els.Client` where it is drawn.
+    const hasClient = 'Client' in els
     // The mobile app draws no Input yet: there the tree has no filter box.
     const Input = 'Input' in els ? els.Input : undefined
     const s = await read($, explorer)
@@ -401,7 +403,7 @@ export const register: Register = (on, options) => {
     const editorRows = Math.max(6, bodyRows - 5)
     // A file opens straight into the editor wherever a Client can draw one
     // (terminal, desktop); elsewhere it is read-only.
-    const editing = Client !== undefined && s.selected !== null && s.content !== null
+    const editing = hasClient && s.selected !== null && s.content !== null
     layout.treeWidth = treeWidth
     layout.editing = editing
     const dirty = isDirty(s)
@@ -595,9 +597,9 @@ export const register: Register = (on, options) => {
       main = <Text dimColor>Select a file on the left. Folders expand with Enter or a click.</Text>
     } else if (s.content === null) {
       main = <Text dimColor>No content.</Text>
-    } else if (editing && Client) {
+    } else if (editing && 'Client' in els) {
       main = (
-        <Client
+        <els.Client
           key={`editor:${s.selected}`}
           module="./editor.tsx"
           props={{ path: s.selected, text: s.content, request: s.request }}

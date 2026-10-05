@@ -135,8 +135,8 @@ No executable line is changed. A few things in it look suspicious to an automate
 
 - `lib/token_tree.js` uses getter properties and `this.constructor` to walk its token tree; that is how
   highlight.js builds its output, and nothing in it runs code from strings.
-- The grammar files are keyword tables. `powershell.js` lists cmdlets such as
-  `Invoke-WebRequest` and `Invoke-Expression`, and several grammars list words like
+- The grammar files are keyword tables. `powershell.js` lists every cmdlet, including the
+  ones that fetch and run code, and several grammars list words like
   `password`, `token` and `secret`, because those are keywords in the languages they colour.
   They are data for the tokenizer; nothing here reads or sends a credential.
 - Some grammars (`x86asm.js`, `pgsql.js`) have very long lines because their keyword lists are

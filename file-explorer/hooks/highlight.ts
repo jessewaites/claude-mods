@@ -266,7 +266,6 @@ const BY_NAME: Record<string, string> = {
   '.gitconfig': 'ini',
   '.gitmodules': 'ini',
   '.editorconfig': 'ini',
-  '.npmrc': 'ini',
   '.env': 'properties',
   '.htaccess': 'apache',
   'nginx.conf': 'nginx',
