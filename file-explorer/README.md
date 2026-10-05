@@ -93,6 +93,11 @@ runs the editor as a `Client` surface module that handles keys locally and posts
 It does not watch the filesystem; it reacts to Claude's edits through a `tool.call` hook and
 otherwise re-reads on `refresh`.
 
+It touches only the files you open or save under the session's working directory. It makes no
+network requests, runs no commands, starts no processes, and stores nothing outside Claude
+Code's own session state (the open file, the tree, the filter). The one option it reads is
+`showIgnored` from its own plugin config.
+
 Colouring is a vendored [highlight.js](https://highlightjs.org/) 11.12, built as ES modules
 because plugin code cannot import from npm or the network. Its tokens are mapped onto the
 terminal's named ANSI colours, so they follow whatever theme the terminal uses.
