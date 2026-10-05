@@ -120,9 +120,10 @@ processes and reads no credentials or environment variables.
 ### About the vendored highlight.js
 
 Colouring comes from [highlight.js](https://highlightjs.org/) 11.12.0 under
-`hooks/vendor/highlight/`, copied unmodified from the npm package's `es/` build except that
-`core.js` ends in `export default` instead of `module.exports` (plugin code cannot import from
-npm or the network). A few things in it look suspicious to an automated scan and are not:
+`hooks/vendor/highlight/`, copied from the npm package with two changes: `core.js` ends in `export default` instead of
+`module.exports` (plugin code cannot import from npm or the network), and its JSDoc comments
+of the form `@typedef {import('highlight.js').X}` are removed, since a scanner reads them as
+dynamic imports of files that are not shipped. No executable line is changed. A few things in it look suspicious to an automated scan and are not:
 
 - `core.js` uses getter properties and `this.constructor` to walk its token tree; that is how
   highlight.js builds its output, and nothing in it runs code from strings.
