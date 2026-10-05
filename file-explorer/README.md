@@ -2,6 +2,8 @@
 
 A file tree and a syntax-coloured text editor in a Claude Code pane.
 
+![Asked for "the blog post index page in the text editor", Claude found src/pages/blog/[...page].astro and opened it in the pane beside the transcript](./assets/editor.png)
+
 For the small edits that aren't worth a prompt: fix a typo, change a label, tweak a value.
 Open the file, type, `ctrl+s`, carry on. Claude never sees it and no tokens are spent.
 
