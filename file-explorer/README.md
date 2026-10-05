@@ -93,8 +93,11 @@ process, and reaches the outside world only through the engine's `$` API. Everyt
 **Reads and writes files.** It lists folders and reads files under the session's working
 directory to draw the tree and the editor, and writes exactly one file at a time: the one you
 have open, when you press `save` or `ctrl+s`. The path is always one you chose by clicking
-the tree, typing it after `/editor`, or asking Claude to open it. It never writes anywhere else,
-never edits settings, build or instruction files on its own, and never deletes anything.
+the tree, typing it after `/editor`, or asking Claude to open it. Because you choose the file,
+that can be any file in the project, including `CLAUDE.md`, `.claude/settings.json`,
+`package.json` or a build script: the plugin writes your edits to the file you opened, with no
+changes of its own, and only when you save. It never writes anywhere else, never writes a
+file on its own, and never deletes anything.
 
 **Watches Claude's file edits.** A `tool.call` hook on Edit, Write and NotebookEdit lets each
 call through unchanged (`next(e)`), then, once the tool has finished, re-reads the folder and the
@@ -120,12 +123,17 @@ processes and reads no credentials or environment variables.
 ### About the vendored highlight.js
 
 Colouring comes from [highlight.js](https://highlightjs.org/) 11.12.0 under
-`hooks/vendor/highlight/`, copied from the npm package with two changes: `core.js` ends in `export default` instead of
-`module.exports` (plugin code cannot import from npm or the network), and its JSDoc comments
-of the form `@typedef {import('highlight.js').X}` are removed, since a scanner reads them as
-dynamic imports of files that are not shipped. No executable line is changed. A few things in it look suspicious to an automated scan and are not:
+`hooks/vendor/highlight/`, as source files rather than the npm bundle. `core.js` is the
+repository's `src/highlight.js` at tag 11.12.0 and `lib/` is its `src/lib/`, with three changes:
+the one npm dependency, `deep-freeze-es6` (ISC), is copied in as `lib/deep_freeze.js`; the
+`import` of `package.json` for the version string is replaced by the literal `'11.12.0'`
+(plugin code cannot import from npm or the network); and JSDoc comments of the form
+`@typedef {import('highlight.js').X}` are removed, since a scanner reads them as dynamic imports
+of files that are not shipped. `languages/` holds the grammars as published in the package's
+`es/languages/`, which are the `src/languages/` files with `export default` on the function.
+No executable line is changed. A few things in it look suspicious to an automated scan and are not:
 
-- `core.js` uses getter properties and `this.constructor` to walk its token tree; that is how
+- `lib/token_tree.js` uses getter properties and `this.constructor` to walk its token tree; that is how
   highlight.js builds its output, and nothing in it runs code from strings.
 - The grammar files are keyword tables. `powershell.js` lists cmdlets such as
   `Invoke-WebRequest` and `Invoke-Expression`, and several grammars list words like
@@ -161,7 +169,7 @@ claude plugin test ./file-explorer
 | `hooks/register.tsx` | The hooks: `/editor`, the open phrase, the `open_file` tool, the pane, saving, the Claude-edit reload |
 | `hooks/editor.tsx` | The editor surface module: keys, cursor, undo, find, drawing |
 | `hooks/highlight.ts` | Language detection by file name, extension or shebang; the colour theme; the tokenizer |
-| `hooks/vendor/highlight/` | highlight.js core and grammars (BSD-3-Clause, licence included) |
+| `hooks/vendor/highlight/` | highlight.js source (`core.js`, `lib/`) and grammars (BSD-3-Clause, licence included) |
 | `types/index.d.ts` | The `$.state` contract and the `open_file` tool's input type |
 | `tests/explorer.test.tsx` | The test suite |
 

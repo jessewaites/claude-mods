@@ -1,10 +1,9 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
-import type { EditorMessage, Explorer, Pending, TreeEntry } from '../types'
+import type { EditorMessage, Explorer, Pending, TreeEntry } from '../types/index.d.ts'
 
 const PANE = 'file-explorer'
-const PLUGIN = 'file-explorer'
 
 const INITIAL: Explorer = {
   root: '',
@@ -318,7 +317,7 @@ export const register: Register = (on, options) => {
     }
   })
 
-  on('tool.call', { tool: `mcp__${PLUGIN}__open_file` }, async ($, e) => {
+  on('tool.call', { tool: 'mcp__file-explorer__open_file' }, async ($, e) => {
     const path = typeof e.path === 'string' ? e.path.trim() : ''
     if (!path) return { deny: 'open_file: give the path of the file to open.' }
     const placed = await openExplorer($, path)

@@ -1,6 +1,6 @@
 import type { ClientElements, ClientKeyEvent, ClientModule } from 'claude-code'
 
-import type { EditorMessage, EditorProps } from '../types'
+import type { EditorMessage, EditorProps } from '../types/index.d.ts'
 import { languageFor, tokenize } from './highlight.ts'
 import type { Line, Style } from './highlight.ts'
 
