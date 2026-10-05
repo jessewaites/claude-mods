@@ -2,7 +2,7 @@
 
 A file tree and a syntax-coloured text editor in a Claude Code pane.
 
-![Asked for "the blog post index page in the text editor", Claude found src/pages/blog/[...page].astro and opened it in the pane beside the transcript](./assets/editor.png)
+![Asked for "the blog post index page in the text editor", Claude found src/pages/blog/[...page].astro and opened it in the pane beside the transcript](https://raw.githubusercontent.com/jessewaites/claude-mods/main/assets/editor.png)
 
 For the small edits that aren't worth a prompt: fix a typo, change a label, tweak a value.
 Open the file, type, `ctrl+s`, carry on. Claude never sees it and no tokens are spent.
@@ -85,22 +85,62 @@ to list them, or in settings:
 - The pane asks for 120 columns by 40 rows and shrinks to what the terminal has; the tree
   takes about a third of the width.
 
-## How it works
+## How it works, and what it touches
 
-The plugin runs inside Claude Code's hook engine, not as a separate process. It reads and
-writes files through the engine's `$.fs` API, draws the pane with a `ui.render` hook, and
-runs the editor as a `Client` surface module that handles keys locally and posts saves back.
-It does not watch the filesystem; it reacts to Claude's edits through a `tool.call` hook and
-otherwise re-reads on `refresh`.
+The plugin is a Claude Code mod: it runs inside Claude Code's hook engine, not as a separate
+process, and reaches the outside world only through the engine's `$` API. Everything it does:
 
-It touches only the files you open or save under the session's working directory. It makes no
-network requests, runs no commands, starts no processes, and stores nothing outside Claude
-Code's own session state (the open file, the tree, the filter). The one option it reads is
-`showIgnored` from its own plugin config.
+**Reads and writes files.** It lists folders and reads files under the session's working
+directory to draw the tree and the editor, and writes exactly one file at a time: the one you
+have open, when you press `save` or `ctrl+s`. The path is always one you chose by clicking
+the tree, typing it after `/editor`, or asking Claude to open it. It never writes anywhere else,
+never edits settings, build or instruction files on its own, and never deletes anything.
 
-Colouring is a vendored [highlight.js](https://highlightjs.org/) 11.12, built as ES modules
-because plugin code cannot import from npm or the network. Its tokens are mapped onto the
-terminal's named ANSI colours, so they follow whatever theme the terminal uses.
+**Watches Claude's file edits.** A `tool.call` hook on Edit, Write and NotebookEdit lets each
+call through unchanged (`next(e)`), then, once the tool has finished, re-reads the folder and the
+open file so the pane shows the result. It does not alter the tool's input or its result.
+
+**Adds one slash command and one tool.** `/editor [path]` opens the pane. The `open_file`
+tool (`mcp__file-explorer__open_file`, one argument, `path`) lets Claude open a file in the
+pane when you ask for one in plain words; it reads that file and reports "Opened …" or
+"Could not open …" back to the model. The plugin answers this tool itself, since it is its own.
+
+**Catches one kind of prompt.** A `prompt.submit` hook drops a prompt that is nothing but
+"open the editor" (or "open the file explorer" and similar) and opens the pane instead of
+sending the prompt to the model. Any other prompt passes through untouched; the plugin never
+submits prompts of its own and never adds text to yours.
+
+**Keeps state in the session.** The open file, the tree, the filter and the draft live in Claude
+Code's session state (`$.state`) and vanish when the session ends. Nothing is written to disk
+besides the file you save. It reads one option, `showIgnored`, from its own plugin config.
+
+**No network, no commands.** It makes no network requests, runs no shell commands, starts no
+processes and reads no credentials or environment variables.
+
+### About the vendored highlight.js
+
+Colouring comes from [highlight.js](https://highlightjs.org/) 11.12.0 under
+`hooks/vendor/highlight/`, copied unmodified from the npm package's `es/` build except that
+`core.js` ends in `export default` instead of `module.exports` (plugin code cannot import from
+npm or the network). A few things in it look suspicious to an automated scan and are not:
+
+- `core.js` uses getter properties and `this.constructor` to walk its token tree; that is how
+  highlight.js builds its output, and nothing in it runs code from strings.
+- The grammar files are keyword tables. `powershell.js` lists cmdlets such as
+  `Invoke-WebRequest` and `Invoke-Expression`, and several grammars list words like
+  `password`, `token` and `secret`, because those are keywords in the languages they colour.
+  They are data for the tokenizer; nothing here reads or sends a credential.
+- Some grammars (`x86asm.js`, `pgsql.js`) have very long lines because their keyword lists are
+  long. They are highlight.js's own source, as published, not a bundle.
+
+The tokens are mapped onto the terminal's named ANSI colours, so they follow its theme.
+
+### Tests
+
+`tests/explorer.test.tsx` is run only by `claude plugin test`. Claude Code never loads it in a
+session. It drives the plugin with the testing kit, which means it calls `$.tool.call`,
+`$.command.run` and `$.prompt.submit` and answers `fs.write` and `tool.call` events in place of
+the engine, to check the plugin's behaviour; none of that code is part of the plugin's runtime.
 
 ## Development
 

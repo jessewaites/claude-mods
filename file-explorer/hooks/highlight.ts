@@ -4,8 +4,8 @@
 //
 // Colours are the terminal's named ANSI colours, so they follow the person's theme.
 
-import hljs from './vendor/highlight/core'
-import type { LanguageFn } from './vendor/highlight/core'
+import hljs from './vendor/highlight/core.js'
+import type { LanguageFn } from './vendor/highlight/core.js'
 
 import lang_accesslog from './vendor/highlight/languages/accesslog.js'
 import lang_actionscript from './vendor/highlight/languages/actionscript.js'

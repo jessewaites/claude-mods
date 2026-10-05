@@ -3,7 +3,7 @@
 Claude Code mods by Jesse Waites: plugins of function hooks that add live panes
 and tools to Claude Code in the terminal and the desktop app.
 
-![The file-explorer pane: a project tree beside a syntax-coloured editor, opened by asking Claude for a file in plain words](./file-explorer/assets/editor.png)
+![The file-explorer pane: a project tree beside a syntax-coloured editor, opened by asking Claude for a file in plain words](./assets/editor.png)
 
 ## Install
 
