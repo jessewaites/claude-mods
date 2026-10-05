@@ -1,0 +1,16 @@
+{
+  "name": "claude-mods",
+  "description": "Jesse Waites's Claude Code mods: live panes and tools for the terminal and desktop app.",
+  "owner": { "name": "Jesse Waites", "url": "https://github.com/jessewaites" },
+  "plugins": [
+    {
+      "name": "file-explorer",
+      "source": "./file-explorer",
+      "description": "A file tree and text editor in a pane: /editor, say \"open the editor\", or ask Claude to open a file in it.",
+      "author": { "name": "Jesse Waites" },
+      "homepage": "https://github.com/jessewaites/claude-mods/tree/main/file-explorer",
+      "license": "MIT",
+      "keywords": ["editor", "file-tree", "pane", "mod"]
+    }
+  ]
+}

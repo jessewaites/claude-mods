@@ -1,0 +1,20 @@
+{
+  "name": "file-explorer",
+  "displayName": "File Explorer",
+  "version": "1.0.0",
+  "description": "A file tree and text editor in a pane: /editor, say \"open the editor\", or ask Claude to open a file in it",
+  "author": { "name": "Jesse Waites", "url": "https://github.com/jessewaites" },
+  "homepage": "https://github.com/jessewaites/claude-mods/tree/main/file-explorer",
+  "repository": "https://github.com/jessewaites/claude-mods",
+  "license": "MIT",
+  "keywords": ["editor", "file-tree", "file-explorer", "pane", "mod", "syntax-highlighting"],
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "showIgnored": {
+      "type": "boolean",
+      "title": "Show ignored folders",
+      "description": "List .git, node_modules, caches and other folders nobody opens by hand.",
+      "default": false
+    }
+  }
+}
